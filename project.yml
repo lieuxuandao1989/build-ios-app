@@ -1,0 +1,19 @@
+name: DemoIPA
+options:
+  bundleIdPrefix: com.example
+targets:
+  DemoIPA:
+    type: application
+    platform: iOS
+    deploymentTarget: "15.0"
+    sources:
+      - DemoIPA
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.demoipa
+        SWIFT_VERSION: "5.0"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Demo IPA
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGNING_ALLOWED: NO
