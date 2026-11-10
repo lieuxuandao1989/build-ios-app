@@ -1,0 +1,47 @@
+name: Build unsigned iOS IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate --spec project.yml
+
+      - name: Build for physical iPhone without signing
+        run: |
+          xcodebuild \
+            -project DemoIPA.xcodeproj \
+            -scheme DemoIPA \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Package unsigned IPA
+        run: |
+          mkdir -p output/Payload
+          cp -R build/Build/Products/Release-iphoneos/DemoIPA.app output/Payload/
+          cd output
+          zip -qry DemoIPA-unsigned.ipa Payload
+          unzip -l DemoIPA-unsigned.ipa | grep 'Payload/DemoIPA.app/'
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DemoIPA-unsigned
+          path: output/DemoIPA-unsigned.ipa
+          if-no-files-found: error
